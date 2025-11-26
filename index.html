@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>GRPG Dice Pools</title>
+<meta name="theme-color" content="#0b1220" />
+<style>
+  :root{
+    --bg:#020617; --fg:#e5e7eb; --muted:#9ca3af;
+    --accent:#22d3ee; --panel:#111827; --btn:#1f2937;
+    --ring:#38bdf8; --ok:#22c55e; --warn:#f59e0b;
+    --menuBg:#020617;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:radial-gradient(1200px 800px at 100% -20%,#111a33 20%,#0b1220),var(--bg);
+    color:var(--fg);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{min-height:100%; display:grid; grid-template-rows:auto 1fr auto;}
+  header{display:flex; align-items:center; gap:12px; padding:14px 14px 0;}
+  h1{font-size:20px; margin:0; letter-spacing:.3px}
+  .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:rgba(34,211,238,.15); color:var(--accent); border:1px solid rgba(34,211,238,.35)}
+  .header-spacer{margin-left:auto; display:flex; gap:8px; align-items:center;}
+
+  .app{max-width:920px; margin:0 auto; padding:14px}
+  .panel{background:var(--panel); backdrop-filter: blur(6px); border:1px solid rgba(56,189,248,.18); border-radius:16px; padding:12px}
+  .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+  .row + .row{margin-top:10px}
+  .tiny{font-size:11px}
+
+  /* === Buttons === */
+  .btn{
+    appearance:none; background:linear-gradient(180deg,#1f2937,#111827); color:#ffffff;
+    border:1px solid rgba(56,189,248,.25); padding:10px 14px; border-radius:12px;
+    font-weight:700; letter-spacing:.2px; cursor:pointer; transition:all .15s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn:hover{border-color:rgba(56,189,248,.6); background:linear-gradient(180deg,#263045,#141a28)}
+  .btn.ghost{background:transparent; border-color:rgba(148,163,184,.28); color:#ffffff}
+  .btn.ghost:hover{border-color:rgba(56,189,248,.5); background:rgba(56,189,248,.08)}
+  .btn.small{padding:6px 10px; font-weight:600}
+  #openColors{padding:12px 20px; font-size:14px;}
+
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px}
+  .pool-btn{
+    width:100%; text-align:center; padding:14px 12px; border-radius:14px;
+    background:linear-gradient(160deg,#0f1a35,#0b1220); border:1px solid rgba(148,163,184,.25);
+    font-weight:800; letter-spacing:.4px; cursor:pointer; color:#ffffff; transition:all .15s ease;
+  }
+  .pool-btn:hover{
+    border-color:rgba(56,189,248,.6);
+    background:linear-gradient(160deg,#15254e,#0b1220);
+  }
+
+  .sum{font-size:22px; font-weight:900}
+  .muted{color:var(--muted)}
+  .history{max-height:240px; overflow:auto; padding-right:6px}
+  .hist-item{
+  border:1px solid var(--accent);
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:8px;
+  background:var(--menuBg);
+  color:#ffffff;
+}
+  .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  .divider{height:1px; background:rgba(148,163,184,.25); margin:8px 0}
+  footer{padding:16px 14px 26px; color:var(--muted); text-align:center}
+
+  /* Drawer */
+  .hamburger{width:42px; height:42px; border-radius:12px; display:inline-grid; place-items:center; color:#ffffff}
+  .drawer{position:fixed; inset:0; pointer-events:none; z-index:900;}
+  .drawer.open{pointer-events:auto}
+  .drawer .scrim{position:absolute; inset:0; background:rgba(0,0,0,.35); opacity:0; transition:.2s}
+  .drawer.open .scrim{opacity:1}
+  .sheet{
+    position:absolute; top:0; bottom:0; left:0; width:320px; max-width:85%;
+    background:var(--menuBg); border-right:1px solid rgba(56,189,248,.25);
+    transform:translateX(-100%); transition:.22s; overflow:auto; color:#ffffff;
+  }
+  .drawer.open .sheet{transform:none}
+  .sheet h2{font-size:16px; margin:0; padding:8px 12px 8px}
+  .sheet .toolrow{display:flex; gap:6px; padding:0 12px 10px}
+  .sheet .toolrow.range-row{flex-direction:column; align-items:stretch; padding-top:12px;}
+  .sheet .toolrow.range-row label{width:100%; color:var(--muted); font-size:12px;}
+  .sheet input[type=range]{width:100%;}
+  .search{width:100%; background:var(--menuBg); color:#ffffff; border:1px solid rgba(148,163,184,.25); border-radius:10px; padding:8px 10px}
+  .pool-list{padding:8px 12px 14px; display:grid; gap:8px}
+  .pool-item{display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; border:1px solid rgba(148,163,184,.2); background:var(--menuBg); color:#ffffff}
+  .pool-item input{width:18px; height:18px}
+
+  .crit{font-weight:800}
+  .breakdown{display:grid; gap:6px}
+  .die-line{padding:6px 8px; border:1px solid rgba(148,163,184,.25); border-radius:10px; background:var(--menuBg); color:#ffffff}
+  .controls{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .pill{font-size:12px; padding:4px 8px; border:1px solid rgba(148,163,184,.25); border-radius:999px; color:var(--muted)}
+
+  /* Dice animation area */
+  .dice-stage{
+    margin-top:10px;
+    border-radius:14px;
+    border:1px solid var(--accent);
+    padding:8px;
+    background:var(--menuBg);
+  }
+  #diceCanvas{
+    width:100%;
+    max-width:100%;
+    height:220px;
+    display:block;
+    border-radius:10px;
+    border:1px solid var(--accent);
+    background:radial-gradient(circle at top,#0f172a,#020617);
+  }
+
+  /* Dropdown for per-die results */
+  .breakdown-details{
+    margin-top:8px;
+    border-radius:10px;
+    border:1px solid var(--menuBg);
+    padding:6px 8px;
+    background:var(--menuBg);
+  }
+  .breakdown-details[open]{
+    background:var(--menuBg);
+  }
+  .breakdown-details summary{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:12px;
+    color:var(--muted);
+    user-select:none;
+  }
+  .breakdown-details summary::-webkit-details-marker{
+    display:none;
+  }
+  .breakdown-scroll{
+    max-height:160px;
+    overflow:auto;
+    margin-top:6px;
+  }
+
+  /* === Color picker popup === */
+
+  .color-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter:blur(2px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .18s ease-out;
+    z-index:950;
+  }
+  .color-backdrop.show{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .color-drawer{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(.96);
+    background:var(--menuBg);
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.45);
+    box-shadow:0 18px 40px rgba(0,0,0,.8);
+    padding:14px 16px 16px;
+    width:min(960px,96vw);
+    max-height:90vh;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .18s ease-out, transform .18s ease-out;
+    z-index:960;
+    color:#e5e7eb;
+  }
+  .color-drawer.open{
+    opacity:1;
+    pointer-events:auto;
+    transform:translate(-50%,-50%) scale(1);
+  }
+  .color-drawer-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .color-drawer-title{
+    font-size:18px;
+    font-weight:600;
+  }
+  #closeColorDrawerBtn{
+    background:#b00020;
+    border:1px solid #f97373;
+    border-radius:8px;
+    color:#ffffff;
+    font-size:20px;
+    font-weight:700;
+    padding:4px 10px;
+    cursor:pointer;
+    min-width:38px;
+    min-height:38px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 0 8px rgba(0,0,0,0.6);
+  }
+  #closeColorDrawerBtn:active{
+    transform:scale(.97);
+  }
+
+  .drawer-content{
+    display:flex;
+    gap:16px;
+    align-items:stretch;
+    width:100%;
+  }
+  .drawer-column{flex:1; min-width:0;}
+  .drawer-column-presets{max-width:36%;}
+  .drawer-column-sliders{max-width:64%;}
+
+  @media (max-width:800px){
+    .drawer-content{flex-direction:column;}
+    .drawer-column-presets, .drawer-column-sliders{max-width:100%;}
+  }
+
+  .color-group{
+    padding:10px 12px;
+    border-radius:10px;
+    background:var(--menuBg);
+    border:1px solid rgba(55,65,81,0.9);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .color-group + .color-group{margin-top:10px;}
+  .color-group-title{
+    font-size:14px;
+    font-weight:600;
+    color:#e5e7eb;
+  }
+  
+  .color-group details{
+    border:none;
+    padding:0;
+  }
+  .color-group summary{
+    list-style:none;
+    cursor:pointer;
+    outline:none;
+  }
+  .color-group summary::-webkit-details-marker{
+    display:none;
+  }
+.slider-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .slider-row span{
+    width:22px;
+    text-align:center;
+    font-size:12px;
+    color:#d1d5db;
+  }
+  .slider-row input[type="range"]{
+    flex:1;
+  }
+
+  #colorPreview{
+    border-radius:10px;
+    border:1px solid rgba(75,85,99,0.9);
+    background:#000;
+    width:100%;
+    max-width:100%;
+    display:block;
+  }
+  .slider-block{margin-top:8px;}
+
+  .preset-name-input{
+    width:100%;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid var(--accent);
+    background:var(--menuBg);
+    color:#e5e7eb;
+    font-size:13px;
+  }
+  .preset-controls-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    margin-bottom:8px;
+  }
+  .color-drawer button.preset-btn{
+    padding:6px 10px;
+    font-size:13px;
+    border-radius:8px;
+    background:var(--panel);
+    border:1px solid var(--accent);
+    color:#e5e7eb;
+    box-shadow:none;
+  }
+  .color-drawer button.preset-btn:active{
+    transform:scale(.97);
+  }
+  #presetSelect{
+    width:100%;
+    max-height:140px;
+    border-radius:8px;
+    border:1px solid var(--accent);
+    background:var(--menuBg);
+    color:#e5e7eb;
+    font-size:13px;
+    padding:6px 8px;
+  }
+</style>
+
+<!-- Matter.js physics engine for GRPG-style dice animation -->
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button id="openDrawer" class="btn hamburger" aria-label="Manage Pools">☰</button>
+    <h1>GRPG Dice Pools <span class="badge">v1</span></h1>
+    <div class="header-spacer">
+      <button id="openColors" class="btn small ghost" type="button">Colors</button>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="panel" aria-label="results">
+      <div class="row" style="justify-content:space-between; align-items:end;">
+        <div>
+          <div class="muted">Last Roll Total</div>
+          <div class="sum" id="sum">—</div>
+        </div>
+        <div class="controls">
+          <button id="copyLast" class="btn small" title="Copy last roll">Copy Last</button>
+          <button id="clearView" class="btn small ghost" title="Clear results view">Clear View</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div class="pill">Crit Roll: <span id="critVal">—</span></div>
+        <div class="pill" id="poolMeta">—</div>
+        <div class="pill" id="timeMeta">—</div>
+      </div>
+
+      <!-- dice animation + dropdown -->
+      <div class="dice-stage" aria-label="Dice roll animation">
+        <canvas id="diceCanvas"></canvas>
+
+        <details id="breakdownDetails" class="breakdown-details">
+          <summary id="breakdownSummary">Dice Results</summary>
+          <div class="breakdown-scroll">
+            <div id="breakdown" class="breakdown"></div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:12px" aria-label="pools">
+      <div id="poolGrid" class="grid" style="margin-top:0;"></div>
+    </section>
+
+    <section class="panel" style="margin-top:12px" aria-label="history">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div class="muted">History (keeps last 50)</div>
+        <div class="row">
+          <button id="clearHistory" class="btn small ghost" title="Clear history">Clear History</button>
+        </div>
+      </div>
+      <div id="history" class="history" style="margin-top:10px"></div>
+    </section>
+  </main>
+
+  <footer>
+    <!-- footer intentionally left blank -->
+  </footer>
+</div>
+
+<!-- Pool management drawer -->
+<div id="drawer" class="drawer" aria-hidden="true">
+  <div class="scrim" id="closeDrawer" aria-label="Close"></div>
+  <aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+
+    <!-- Animation speed slider -->
+    <div class="toolrow range-row">
+      <label for="animSpeed">
+        <span class="tiny" style="display:block;margin-bottom:4px;">Animation Speed</span>
+        <input id="animSpeed" type="range" min="0.5" max="2" step="0.1" value="1" />
+      </label>
+    </div>
+
+    <h2 id="drawerTitle">Manage Pools</h2>
+
+    <div class="toolrow">
+      <input id="search" class="search" type="search" placeholder="Search pools…" />
+    </div>
+    <div class="toolrow">
+      <button id="selectAll" class="btn small">Select All</button>
+      <button id="selectNone" class="btn small ghost">None</button>
+      <button id="selectDefault" class="btn small">Default 1–8</button>
+    </div>
+    <div id="poolList" class="pool-list"></div>
+  </aside>
+</div>
+
+<!-- Color customization popup -->
+<div id="colorBackdrop" class="color-backdrop"></div>
+<div id="colorDrawer" class="color-drawer" aria-hidden="true">
+  <div class="color-drawer-header">
+    <div class="color-drawer-title">Color Theme</div>
+    <button type="button" id="closeColorDrawerBtn">✕</button>
+  </div>
+
+  <div class="drawer-content">
+    <!-- Left: presets -->
+    <div class="drawer-column drawer-column-presets">
+      <div class="color-group">
+        <div class="color-group-title">Presets</div>
+        <input id="presetName" class="preset-name-input" type="text" placeholder="Preset name">
+        <div class="preset-controls-row">
+          <button type="button" id="savePresetBtn" class="preset-btn">Save</button>
+          <button type="button" id="loadPresetBtn" class="preset-btn">Load</button>
+          <button type="button" id="deletePresetBtn" class="preset-btn">Delete</button>
+        </div>
+        <select id="presetSelect" size="7"></select>
+      </div>
+    </div>
+
+    <!-- Right: preview + sliders -->
+    <div class="drawer-column drawer-column-sliders">
+      <div id="color-controls">
+        <div class="slider-block">
+          <canvas id="colorPreview" width="440" height="260"></canvas>
+          <div id="colorPanel" style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Dice Face</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="faceH" min="0" max="360" value="190">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="faceS" min="0" max="100" value="75">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="faceV" min="0" max="100" value="90">
+                </div>
+              </details>
+            </div>
+
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Dice Number / Edges</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="edgeH" min="0" max="360" value="210">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="edgeS" min="0" max="100" value="15">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="edgeV" min="0" max="100" value="98">
+                </div>
+              </details>
+            </div>
+
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Dice Table Background</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="bgH" min="0" max="360" value="220">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="bgS" min="0" max="100" value="40">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="bgV" min="0" max="100" value="14">
+                </div>
+              </details>
+            </div>
+
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Page Background</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="pageBgH" min="0" max="360" value="220">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="pageBgS" min="0" max="100" value="45">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="pageBgV" min="0" max="100" value="14">
+                </div>
+              </details>
+            </div>
+
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Buttons</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="selH" min="0" max="360" value="200">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="selS" min="0" max="100" value="25">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="selV" min="0" max="100" value="28">
+                </div>
+              </details>
+            </div>
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Accents</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="accentH" min="0" max="360" value="220">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="accentS" min="0" max="100" value="20">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="accentV" min="0" max="100" value="40">
+                </div>
+              </details>
+            </div>
+
+            <div class="color-group">
+              <details open>
+                <summary class="color-group-title">Menus Background</summary>
+                <div class="slider-row">
+                  <span>H</span>
+                  <input type="range" id="menuBgH" min="0" max="360" value="230">
+                </div>
+                <div class="slider-row">
+                  <span>S</span>
+                  <input type="range" id="menuBgS" min="0" max="100" value="90">
+                </div>
+                <div class="slider-row">
+                  <span>V</span>
+                  <input type="range" id="menuBgV" min="0" max="100" value="10">
+                </div>
+              </details>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- Data ----------
+  const POOLS = [
+    "1d4","1d6","1d8","1d4+1d6","2d6","1d6+1d8","2d8","3d6",
+    "1d6+2d8","4d6","3d6+1d8","2d6+2d8","5d6","4d8","3d6+2d8","6d6",
+    "5d6+1d8","5d8","7d6","6d6+1d8","5d6+2d8","8d6","3d6+4d8","2d6+5d8",
+    "9d6","7d8","3d6+5d8","10d6","5d6+4d8","8d8","11d6","6d6+4d8",
+    "5d6+5d8","9d8","7d6+4d8","6d6+5d8","5d6+6d8","10d8","7d6+5d8","14d6",
+    "5d6+7d8","11d8","15d6","6d6+7d8","9d6+5d8","12d8","7d6+7d8","10d6+5d8",
+    "17d6","13d8","7d6+8d8","18d6","9d6+7d8","14d8","19d6","10d6+7d8",
+    "9d6+8d8","15d8","7d6+10d8","6d6+11d8"
+  ];
+  const DEFAULT_VISIBLE = new Set([1,2,3,4,5,6,7,8]);
+
+  // ---------- DOM ----------
+  const byId = id => document.getElementById(id);
+
+  const poolGrid     = byId('poolGrid');
+  const histEl       = byId('history');
+  const sumEl        = byId('sum');
+  const breakdownEl  = byId('breakdown');
+  const critEl       = byId('critVal');
+  const poolMetaEl   = byId('poolMeta');
+  const timeMetaEl   = byId('timeMeta');
+  const breakdownSummaryEl = byId('breakdownSummary');
+
+  const copyBtn         = byId('copyLast');
+  const clearViewBtn    = byId('clearView');
+  const clearHistoryBtn = byId('clearHistory');
+
+  const drawer           = byId('drawer');
+  const openDrawerBtn    = byId('openDrawer');
+  const closeDrawerScrim = byId('closeDrawer');
+  const poolList         = byId('poolList');
+  const searchInput      = byId('search');
+  const selAllBtn        = byId('selectAll');
+  const selNoneBtn       = byId('selectNone');
+  const selDefaultBtn    = byId('selectDefault');
+
+  const animSpeedInput   = byId('animSpeed');
+  const diceCanvas       = byId('diceCanvas');
+
+  // Color UI DOM
+  const openColorsBtn        = byId('openColors');
+  const colorBackdrop        = byId('colorBackdrop');
+  const colorDrawer          = byId('colorDrawer');
+  const closeColorDrawerBtn  = byId('closeColorDrawerBtn');
+
+  const faceH  = byId('faceH'),  faceS  = byId('faceS'),  faceV  = byId('faceV');
+  const edgeH  = byId('edgeH'),  edgeS  = byId('edgeS'),  edgeV  = byId('edgeV');
+  const bgH    = byId('bgH'),    bgS    = byId('bgS'),    bgV    = byId('bgV');
+  const pageBgH= byId('pageBgH'),pageBgS= byId('pageBgS'),pageBgV= byId('pageBgV');
+  const selH   = byId('selH'),   selS   = byId('selS'),   selV   = byId('selV');
+  const accentH= byId('accentH'),accentS= byId('accentS'),accentV= byId('accentV');
+  const menuBgH= byId('menuBgH'),menuBgS= byId('menuBgS'),menuBgV= byId('menuBgV');
+  const rollH  = byId('rollH'),  rollS  = byId('rollS'),  rollV  = byId('rollV');
+
+  const presetSelect      = byId('presetSelect');
+  const presetNameInput   = byId('presetName');
+  const savePresetBtn     = byId('savePresetBtn');
+  const loadPresetBtn     = byId('loadPresetBtn');
+  const deletePresetBtn   = byId('deletePresetBtn');
+  const previewCanvas     = byId('colorPreview');
+
+  // ---------- Storage ----------
+  const LS_VISIBLE    = 'grpg.visiblePools';
+  const LS_HISTORY    = 'grpg.history';
+  const LS_ANIMSPEED  = 'grpg.animationSpeed';
+  const PRESET_STORAGE_KEY = 'grpgDiceColorPresets';
+
+  function loadVisible(){
+    try{
+      const raw = localStorage.getItem(LS_VISIBLE);
+      if(!raw) return new Set(DEFAULT_VISIBLE);
+      const arr = JSON.parse(raw);
+      return new Set(arr);
+    }catch{
+      return new Set(DEFAULT_VISIBLE);
+    }
+  }
+  function saveVisible(set){
+    localStorage.setItem(LS_VISIBLE, JSON.stringify([...set].sort((a,b)=>a-b)));
+  }
+
+  function loadHistory(){
+    try{
+      const raw = localStorage.getItem(LS_HISTORY);
+      return raw ? JSON.parse(raw) : [];
+    }catch{
+      return [];
+    }
+  }
+  function saveHistory(arr){
+    localStorage.setItem(LS_HISTORY, JSON.stringify(arr.slice(0,50)));
+  }
+
+  function loadAnimSpeed(){
+    try{
+      const raw = localStorage.getItem(LS_ANIMSPEED);
+      if(!raw) return 1;
+      let v = parseFloat(raw);
+      if (isNaN(v)) v = 1;
+      if (v < 0.5) v = 0.5;
+      if (v > 2.0) v = 2.0;
+      return v;
+    }catch{
+      return 1;
+    }
+  }
+  function saveAnimSpeed(v){
+    try{
+      localStorage.setItem(LS_ANIMSPEED, String(v));
+    }catch{}
+  }
+
+  let visiblePools    = loadVisible();
+  let HISTORY         = loadHistory();
+  let lastRoll        = null;
+  let animationSpeed  = loadAnimSpeed();
+
+  // ---------- Utils ----------
+  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+  function rngUpTo(max){
+    if (window.crypto?.getRandomValues){
+      const arr = new Uint32Array(1); crypto.getRandomValues(arr);
+      return (arr[0] % max) + 1;
+    }
+    return Math.floor(Math.random()*max)+1;
+  }
+  function rngCrit00to99(){
+    if (window.crypto?.getRandomValues){
+      const arr = new Uint32Array(1); crypto.getRandomValues(arr);
+      return arr[0] % 100;
+    }
+    return Math.floor(Math.random()*100);
+  }
+  const z2 = n => n.toString().padStart(2,'0');
+
+  function parseFormula(formula){
+    return formula.split('+').map(tok=>{
+      const m = tok.trim().match(/^(\d+)d(\d+)$/i);
+      if(!m) throw new Error('Bad formula: '+formula);
+      return {count: parseInt(m[1],10), sides: parseInt(m[2],10)};
+    });
+  }
+
+  function explodeDie(sides){
+    const chain = [];
+    while(true){
+      const roll = rngUpTo(sides);
+      chain.push(roll);
+      if (roll !== sides) break;
+    }
+    const sum = chain.reduce((a,b)=>a+b,0);
+    return {chain, sum};
+  }
+
+  function rollPool(formula){
+    const parts = parseFormula(formula);
+    const perDieLines = [];
+    const diceStates  = [];
+    let total = 0;
+
+    for (const part of parts){
+      const {count, sides} = part;
+      for (let i=0;i<count;i++){
+        const r = explodeDie(sides);
+        total += r.sum;
+        const arrows = r.chain.join(' \u2192 ');
+        const line = `d${sides}: ${arrows} (${r.sum})`;
+        perDieLines.push(line);
+        diceStates.push({ sides, chain: r.chain.slice(), sum: r.sum });
+      }
+    }
+
+    const crit = rngCrit00to99();
+    return { total, lines: perDieLines, crit, dice: diceStates };
+  }
+
+  // ---------- Dice animation (Matter.js GRPG-style) ----------
+  const physicsDice = {
+    engine: null,
+    world:  null,
+    ctx:    null,
+    width:  0,
+    height: 0,
+    dice:   [],
+    ready:  false
+  };
+
+  // dynamic colors (updated via color panel)
+  let diceFaceColor = '#22d3ee';
+  let diceEdgeColor = '#e5e7eb';
+  let diceTableColor = '#020617';
+
+  function initPhysicsDiceCanvas(){
+    if (!diceCanvas) return;
+    const canvas = diceCanvas;
+    const ctx    = canvas.getContext('2d');
+    physicsDice.ctx = ctx;
+
+    function resize(){
+      const rect = canvas.getBoundingClientRect();
+      const dpr  = window.devicePixelRatio || 1;
+      canvas.width  = rect.width  * dpr;
+      canvas.height = rect.height * dpr;
+      physicsDice.width  = rect.width;
+      physicsDice.height = rect.height;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    if (!window.Matter){
+      console.warn('Matter.js not available yet.');
+      return;
+    }
+
+    const { Engine, World, Bodies } = Matter;
+    const engine = Engine.create();
+    engine.world.gravity.y = 0.6;
+    physicsDice.engine = engine;
+    physicsDice.world  = engine.world;
+
+    const W = physicsDice.width  || 600;
+    const H = physicsDice.height || 220;
+    const wallThickness = 40;
+
+    const ground = Bodies.rectangle(W/2, H + wallThickness/2, W, wallThickness, { isStatic:true });
+    const ceiling= Bodies.rectangle(W/2, -wallThickness/2,   W, wallThickness, { isStatic:true });
+    const leftW  = Bodies.rectangle(-wallThickness/2, H/2, wallThickness, H, { isStatic:true });
+    const rightW = Bodies.rectangle(W + wallThickness/2, H/2, wallThickness, H, { isStatic:true });
+
+    World.add(physicsDice.world, [ground, ceiling, leftW, rightW]);
+
+    physicsDice.ready = true;
+    requestAnimationFrame(updatePhysicsDice);
+  }
+
+  function clearPhysicsDice(){
+    if (!physicsDice.world) return;
+    physicsDice.dice.forEach(d=>{
+      if (d.body) Matter.World.remove(physicsDice.world, d.body);
+    });
+    physicsDice.dice = [];
+  }
+
+  function launchDiceAnimation(entry){
+    if (!physicsDice.ready || !physicsDice.world) return;
+    clearPhysicsDice();
+
+    const { Bodies, Body, World } = Matter;
+    const W = physicsDice.width  || diceCanvas.getBoundingClientRect().width  || 600;
+    const H = physicsDice.height || diceCanvas.getBoundingClientRect().height || 220;
+
+    const d8Size = 52;
+    const d6Size = d8Size * 0.5;
+    const d4Size = d8Size;
+    const radius = d8Size * 0.7;
+
+    const data = entry.dice || [];
+
+    data.forEach(dieData=>{
+      const sides = dieData.sides;
+      const chain = dieData.chain || [];
+      const sum   = dieData.sum;
+
+      const startX = (Math.random()*0.6 + 0.2) * W;
+      const startY = Math.random()*40 + 40;
+
+      let body;
+      if (sides === 4){
+        const baseW  = d4Size * 0.9;
+        const height = d4Size * 0.8;
+        const verts = [
+          { x: startX,           y: startY - height * 0.6 },
+          { x: startX - baseW/2, y: startY + height * 0.4 },
+          { x: startX + baseW/2, y: startY + height * 0.4 }
+        ];
+        body = Bodies.fromVertices(startX, startY, [verts], {
+          restitution:0.3, friction:0.35, frictionAir:0.01, density:0.002
+        }, true);
+      } else if (sides === 8){
+        body = Bodies.polygon(startX, startY, 8, radius, {
+          restitution:0.3, friction:0.35, frictionAir:0.01, density:0.002
+        });
+      } else {
+        body = Bodies.rectangle(startX, startY, d6Size, d6Size, {
+          restitution:0.3, friction:0.35, frictionAir:0.01, density:0.002
+        });
+      }
+      World.add(physicsDice.world, body);
+
+      const throwSpeedX = (Math.random()*4 + 5) * (Math.random()<0.5 ? -1 : 1);
+      const throwSpeedY = Math.random()*-1;
+
+      let spinMin = 0.10;
+      let spinMax = 0.30;
+      if (sides === 8){
+        spinMin = 0.02;
+        spinMax = 0.04;
+      }
+      const spin = (Math.random()*(spinMax - spinMin) + spinMin) *
+                   (Math.random()<0.5 ? -1 : 1);
+
+      Body.setVelocity(body, { x: throwSpeedX, y: throwSpeedY });
+      Body.setAngularVelocity(body, spin);
+
+      // cumulative sums for each roll in the chain
+      const partialSums = [];
+      let acc = 0;
+      for (const v of chain){
+        acc += v;
+        partialSums.push(acc);
+      }
+
+      const maxHits = chain.filter(v => v === sides).length;
+      const explosionStages = maxHits;
+      const exploded = explosionStages > 0;
+
+      physicsDice.dice.push({
+        body,
+        sides,
+        chain,
+        sum,
+        partialSums,
+        displaySum: partialSums.length ? partialSums[0] : sum,
+        currentFace: '-',
+        rolling:     true,
+        settledFrames: 0,
+        frameCounter:  0,
+        exploded,
+        explosionStages,
+        explosionStageIndex: 0,
+        explosionTimer: 0
+      });
+    });
+  }
+
+  function updatePhysicsDice(){
+    const pd = physicsDice;
+    if (!pd.engine || !pd.ctx){
+      requestAnimationFrame(updatePhysicsDice);
+      return;
+    }
+
+    const { Engine, Body } = Matter;
+    const ctx = pd.ctx;
+    const W   = pd.width  || diceCanvas.getBoundingClientRect().width  || 600;
+    const H   = pd.height || diceCanvas.getBoundingClientRect().height || 220;
+
+    const maxSpeed     = 20;
+    const speedThresh  = 0.35;
+    const settleFrames = 4;
+
+    const baseDt = 1000/60;
+    Engine.update(pd.engine, baseDt * animationSpeed);
+
+    ctx.clearRect(0,0,W,H);
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,diceTableColor);
+    grad.addColorStop(1,diceTableColor);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,W,H);
+
+    const faceColor = diceFaceColor;
+    const edgeColor = diceEdgeColor;
+
+    pd.dice.forEach(die=>{
+      const body = die.body;
+
+      let vx = body.velocity.x;
+      let vy = body.velocity.y;
+      let speed = Math.hypot(vx,vy);
+      if (speed > maxSpeed){
+        const s = maxSpeed / speed;
+        Body.setVelocity(body, { x:vx*s, y:vy*s });
+      }
+
+      const baseMaxAngular = 0.5;
+      const dieMaxAngular  = (die.sides === 8) ? 0.22 : baseMaxAngular;
+      if (Math.abs(body.angularVelocity) > dieMaxAngular){
+        Body.setAngularVelocity(body, Math.sign(body.angularVelocity)*dieMaxAngular);
+      }
+
+      speed = Math.hypot(body.velocity.x, body.velocity.y);
+      const angSpeed = Math.abs(body.angularVelocity);
+      if (speed < speedThresh && angSpeed < speedThresh){
+        die.settledFrames++;
+        if (die.settledFrames > settleFrames){
+          die.rolling = false;
+        }
+      } else {
+        die.settledFrames = 0;
+      }
+
+      // rolling vs settled face (speed-adjusted flicker)
+      die.frameCounter = (die.frameCounter || 0) + animationSpeed;
+      if (die.rolling){
+        if (die.frameCounter >= 8){
+          die.frameCounter = 0;
+          die.currentFace = 1 + (Math.floor(Math.random()*die.sides));
+        }
+      } else {
+        die.currentFace = die.displaySum;
+      }
+
+      // multi-stage explosions with cumulative value updates
+      let numberScale = 1;
+      let shakeX = 0, shakeY = 0;
+      if (!die.rolling && die.exploded && die.explosionStageIndex < die.explosionStages){
+        const framesActive = 12;
+        const framesRest   = 18;
+        const framesPerExplosion = framesActive + framesRest;
+
+        if (die.explosionTimer < framesActive){
+          const t  = die.explosionTimer / framesActive;
+          const tt = Math.max(0, Math.min(1,t));
+          numberScale = 1 + 0.4 * (1 - tt);
+          const shakeAmp = 6 * (1 - tt);
+          shakeX = (Math.random()-0.5)*2*shakeAmp;
+          shakeY = (Math.random()-0.5)*2*shakeAmp;
+        }
+
+        die.explosionTimer += animationSpeed;
+        if (die.explosionTimer >= framesPerExplosion){
+          die.explosionTimer = 0;
+          die.explosionStageIndex++;
+
+          if (die.explosionStageIndex < die.explosionStages){
+            const idx = die.explosionStageIndex;
+            if (idx < die.partialSums.length){
+              die.displaySum = die.partialSums[idx];
+            }
+          } else {
+            die.displaySum = die.sum;
+          }
+        }
+      }
+
+      const drawX = body.position.x + shakeX;
+      const drawY = body.position.y + shakeY;
+
+      ctx.save();
+      ctx.translate(drawX, drawY);
+      ctx.rotate(body.angle);
+
+      ctx.fillStyle   = faceColor;
+      ctx.strokeStyle = edgeColor;
+      ctx.lineWidth   = 3;
+
+      if (die.exploded && !die.rolling){
+        ctx.shadowColor = edgeColor;
+        ctx.shadowBlur  = 25;
+      } else {
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur  = 0;
+      }
+
+      const verts = body.vertices;
+      ctx.beginPath();
+      ctx.moveTo(verts[0].x - drawX, verts[0].y - drawY);
+      for (let i=1;i<verts.length;i++){
+        ctx.lineTo(verts[i].x - drawX, verts[i].y - drawY);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // centered value text with tiny tweak for d6
+      ctx.save();
+      ctx.translate(drawX, drawY);
+      ctx.scale(numberScale, numberScale);
+      ctx.fillStyle = edgeColor;
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const textOffsetY = (die.sides === 6 ? 1 : 0);
+      ctx.fillText(String(die.currentFace), 0, textOffsetY);
+      ctx.restore();
+    });
+
+    requestAnimationFrame(updatePhysicsDice);
+  }
+
+  // ---------- Rendering ----------
+  function renderPoolButtons(){
+    poolGrid.innerHTML = '';
+    for (let i=1; i<=POOLS.length; i++){
+      if(!visiblePools.has(i)) continue;
+      const btn = document.createElement('button');
+      btn.className = 'pool-btn';
+      btn.textContent = `Pool ${i}`;
+      btn.setAttribute('data-pool', String(i));
+      btn.addEventListener('click', ()=> handleRoll(i));
+      poolGrid.appendChild(btn);
+    }
+    applySelectorColorToPoolButtons();
+  }
+
+  function renderDrawer(filterText=''){
+    const q = filterText.trim().toLowerCase();
+    poolList.innerHTML = '';
+    for (let i=1;i<=POOLS.length;i++){
+      const name    = `Pool ${i}`;
+      const formula = POOLS[i-1];
+      const display = `${name} — ${formula}`;
+      if(q && !display.toLowerCase().includes(q)) continue;
+
+      const row = document.createElement('label');
+      row.className = 'pool-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = visiblePools.has(i);
+      cb.addEventListener('change', ()=>{
+        if(cb.checked) visiblePools.add(i); else visiblePools.delete(i);
+        saveVisible(visiblePools);
+        renderPoolButtons();
+      });
+      const span = document.createElement('span');
+      span.textContent = display;
+      row.appendChild(cb);
+      row.appendChild(span);
+      poolList.appendChild(row);
+    }
+  }
+
+  function renderHistory(){
+    histEl.innerHTML = '';
+    for (const h of HISTORY){
+      const div = document.createElement('div');
+      div.className = 'hist-item';
+      const header = document.createElement('div');
+      header.innerHTML = `<strong>${h.poolName}</strong> • <span class="mono">${h.formula}</span> • <span class="muted">${h.time}</span>`;
+      const crit = document.createElement('div');
+      crit.innerHTML = `<span class="pill">Crit Roll: <span class="crit mono">${z2(h.crit)}%</span></span> &nbsp; <span class="pill">Total: <strong>${h.total}</strong></span>`;
+      const hr = document.createElement('div'); hr.className = 'divider';
+      const lines = document.createElement('div'); lines.className = 'mono';
+      lines.style.whiteSpace = 'pre-wrap';
+      lines.textContent = h.lines.join('\n');
+
+      div.appendChild(header);
+      div.appendChild(crit);
+      div.appendChild(hr);
+      div.appendChild(lines);
+      histEl.appendChild(div);
+    }
+  }
+
+  function renderResultView(entry){
+    sumEl.textContent      = entry.total;
+    critEl.textContent     = `${z2(entry.crit)}%`;
+    poolMetaEl.textContent = `${entry.poolName} • ${entry.formula}`;
+    timeMetaEl.textContent = entry.time;
+    breakdownEl.innerHTML  = '';
+    entry.lines.forEach(line=>{
+      const d = document.createElement('div');
+      d.className = 'die-line mono';
+      d.textContent = line;
+      breakdownEl.appendChild(d);
+    });
+    breakdownSummaryEl.textContent = `Dice Results (${entry.lines.length} dice)`;
+  }
+
+  // ---------- Actions ----------
+  function handleRoll(poolNumber){
+    const idx     = clamp(poolNumber,1,POOLS.length)-1;
+    const formula = POOLS[idx];
+    const name    = `Pool ${poolNumber}`;
+    const { total, lines, crit, dice } = rollPool(formula);
+    const time    = new Date().toLocaleTimeString();
+
+    const entry = { poolName: name, formula, total, lines, crit, time, dice };
+    lastRoll = entry;
+
+    HISTORY.unshift(entry);
+    if(HISTORY.length > 50) HISTORY.length = 50;
+    saveHistory(HISTORY);
+
+    renderResultView(entry);
+    renderHistory();
+    launchDiceAnimation(entry);
+
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+
+  copyBtn.addEventListener('click', ()=>{
+    if(!lastRoll) return;
+    const text =
+`${lastRoll.poolName} • ${lastRoll.formula}
+Crit Roll: ${z2(lastRoll.crit)}%
+Total: ${lastRoll.total}
+${lastRoll.lines.join('\n')}`;
+    navigator.clipboard?.writeText(text);
+    if (navigator.vibrate) navigator.vibrate(10);
+  });
+
+  clearViewBtn.addEventListener('click', ()=>{
+    sumEl.textContent     = '—';
+    critEl.textContent    = '—';
+    poolMetaEl.textContent= '—';
+    timeMetaEl.textContent= '—';
+    breakdownEl.innerHTML = '';
+    breakdownSummaryEl.textContent = 'Dice Results';
+    clearPhysicsDice();
+    if (navigator.vibrate) navigator.vibrate(8);
+  });
+
+  clearHistoryBtn.addEventListener('click', ()=>{
+    HISTORY = [];
+    saveHistory(HISTORY);
+    renderHistory();
+    if (navigator.vibrate) navigator.vibrate(8);
+  });
+
+  function openDrawerPanel(){
+    drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden','false');
+  }
+  function closeDrawerPanel(){
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden','true');
+  }
+  openDrawerBtn.addEventListener('click', openDrawerPanel);
+  closeDrawerScrim.addEventListener('click', closeDrawerPanel);
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && drawer.classList.contains('open')) closeDrawerPanel();
+  });
+
+  searchInput.addEventListener('input', ()=> renderDrawer(searchInput.value));
+  selAllBtn.addEventListener('click', ()=>{
+    visiblePools = new Set(Array.from({length:POOLS.length},(_,i)=>i+1));
+    saveVisible(visiblePools); renderDrawer(searchInput.value); renderPoolButtons();
+  });
+  selNoneBtn.addEventListener('click', ()=>{
+    visiblePools = new Set();
+    saveVisible(visiblePools); renderDrawer(searchInput.value); renderPoolButtons();
+  });
+  selDefaultBtn.addEventListener('click', ()=>{
+    visiblePools = new Set(DEFAULT_VISIBLE);
+    saveVisible(visiblePools); renderDrawer(searchInput.value); renderPoolButtons();
+  });
+
+  // Animation speed slider hook-up
+  if (animSpeedInput){
+    animSpeedInput.value = String(animationSpeed);
+    animSpeedInput.addEventListener('input', ()=>{
+      const v = parseFloat(animSpeedInput.value);
+      if (!isNaN(v)){
+        animationSpeed = clamp(v,0.5,2.0);
+        saveAnimSpeed(animationSpeed);
+      }
+    });
+  }
+
+  // ---------- Color system ----------
+
+  function HSVtoRGB(h, s, v) {
+    s/=100; v/=100;
+    let c=v*s;
+    let x=c*(1-Math.abs((h/60)%2-1));
+    let m=v-c;
+    let r=0,g=0,b=0;
+    if(h<60){r=c;g=x;}
+    else if(h<120){r=x;g=c;}
+    else if(h<180){g=c;b=x;}
+    else if(h<240){g=x;b=c;}
+    else if(h<300){r=x;b=c;}
+    else {r=c;b=x;}
+    r=Math.round((r+m)*255);
+    g=Math.round((g+m)*255);
+    b=Math.round((b+m)*255);
+    return "rgb("+r+","+g+","+b+")";
+  }
+
+  function getFaceColor(){
+    return HSVtoRGB(Number(faceH.value), Number(faceS.value), Number(faceV.value));
+  }
+  function getEdgeColor(){
+    return HSVtoRGB(Number(edgeH.value), Number(edgeS.value), Number(edgeV.value));
+  }
+  function getBgColor(){
+    return HSVtoRGB(Number(bgH.value), Number(bgS.value), Number(bgV.value));
+  }
+  function getPageBgColor(){
+    return HSVtoRGB(Number(pageBgH.value), Number(pageBgS.value), Number(pageBgV.value));
+  }
+  function getRollColor(){
+    return getSelectorColor();
+  }
+  function getSelectorColor(){
+    return HSVtoRGB(Number(selH.value), Number(selS.value), Number(selV.value));
+  }
+  function getAccentColor(){
+    return HSVtoRGB(Number(accentH.value), Number(accentS.value), Number(accentV.value));
+  }
+  function getMenuBgColor(){
+    return HSVtoRGB(Number(menuBgH.value), Number(menuBgS.value), Number(menuBgV.value));
+  }
+
+  function updatePageBackground(){
+    document.body.style.background = getPageBgColor();
+  }
+  function applySelectorColorToPoolButtons(){
+    const color = getSelectorColor();
+    document.querySelectorAll('.pool-btn').forEach(btn=>{
+      btn.style.background = color;
+    });
+  }
+  function applyRollColorToActionButtons(){
+  const color = getRollColor();
+
+  // Main app buttons (non-ghost)
+  document.querySelectorAll('.btn:not(.ghost)').forEach(btn=>{
+    btn.style.background = color;
+  });
+
+  // Preset buttons inside the color drawer
+  document.querySelectorAll('.color-drawer button.preset-btn').forEach(btn=>{
+    btn.style.background = color;
+  });
+}
+
+  let previewCtx = previewCanvas ? previewCanvas.getContext('2d') : null;
+
+  // HiDPI setup for crisp preview rendering
+  function setupPreviewCanvas(){
+    if (!previewCanvas || !previewCtx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = previewCanvas.getBoundingClientRect();
+    const width = rect.width || previewCanvas.width || 440;
+    const height = rect.height || previewCanvas.height || 260;
+    previewCanvas.width = width * dpr;
+    previewCanvas.height = height * dpr;
+    previewCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener('resize', setupPreviewCanvas);
+  setupPreviewCanvas();
+
+  function drawPreview() {
+    if (!previewCtx) return;
+
+    // Use CSS size for logical drawing area so everything stays crisp with HiDPI transform
+    const rect = previewCanvas.getBoundingClientRect();
+    const w = rect.width || previewCanvas.width;
+    const h = rect.height || previewCanvas.height;
+
+    previewCtx.clearRect(0, 0, w, h);
+
+    // Helper to draw rounded rectangles (fill only)
+    function drawRoundedRect(px, py, width, height, radius, fillColor) {
+      const r = Math.min(radius, height / 2, width / 2);
+      previewCtx.beginPath();
+      previewCtx.moveTo(px + r, py);
+      previewCtx.lineTo(px + width - r, py);
+      previewCtx.quadraticCurveTo(px + width, py, px + width, py + r);
+      previewCtx.lineTo(px + width, py + height - r);
+      previewCtx.quadraticCurveTo(px + width, py + height, px + width - r, py + height);
+      previewCtx.lineTo(px + r, py + height);
+      previewCtx.quadraticCurveTo(px, py + height, px, py + height - r);
+      previewCtx.lineTo(px, py + r);
+      previewCtx.quadraticCurveTo(px, py, px + r, py);
+      previewCtx.closePath();
+      previewCtx.fillStyle = fillColor;
+      previewCtx.fill();
+    }
+
+    // Helper to draw rounded rectangles with border
+    function drawRoundedRectBordered(px, py, width, height, radius, fillColor, strokeColor, lineWidth = 2) {
+      const r = Math.min(radius, height / 2, width / 2);
+      previewCtx.beginPath();
+      previewCtx.moveTo(px + r, py);
+      previewCtx.lineTo(px + width - r, py);
+      previewCtx.quadraticCurveTo(px + width, py, px + width, py + r);
+      previewCtx.lineTo(px + width, py + height - r);
+      previewCtx.quadraticCurveTo(px + width, py + height, px + width - r, py + height);
+      previewCtx.lineTo(px + r, py + height);
+      previewCtx.quadraticCurveTo(px, py + height, px, py + height - r);
+      previewCtx.lineTo(px, py + r);
+      previewCtx.quadraticCurveTo(px, py, px + r, py);
+      previewCtx.closePath();
+      previewCtx.fillStyle = fillColor;
+      previewCtx.fill();
+      previewCtx.lineWidth = lineWidth;
+      previewCtx.strokeStyle = strokeColor;
+      previewCtx.stroke();
+    }
+
+    // === 1. Page background (outer world) ===
+    previewCtx.fillStyle = getPageBgColor();
+    previewCtx.fillRect(0, 0, w, h);
+
+    // === 2. Main results panel (uses accent/panel color) ===
+    const panelMargin = 14;
+    const panelX = panelMargin;
+    const panelY = 12;
+    const panelW = w - panelMargin * 2;
+    const panelH = h * 0.78;
+    const panelRadius = 18;
+    const panelColor = getAccentColor();
+    drawRoundedRect(panelX, panelY, panelW, panelH, panelRadius, panelColor);
+
+    // === 3. Dice-stage frame (Menus Background with accent border) ===
+    const stageMarginSide = 14;
+    const stageMarginTop = 34; // small header gap
+    const stageMarginBottom = 16;
+    const stageX = panelX + stageMarginSide;
+    const stageY = panelY + stageMarginTop;
+    const stageW = panelW - stageMarginSide * 2;
+    const stageH = panelH - stageMarginTop - stageMarginBottom;
+    const stageRadius = 16;
+    const menuBg = getMenuBgColor();
+    const accent = getAccentColor();
+    drawRoundedRectBordered(stageX, stageY, stageW, stageH, stageRadius, menuBg, accent, 2);
+
+    // === 4. Actual dice canvas area (Dice Table Background with accent border) ===
+    const canvasMarginSide = 12;
+    const canvasMarginTop = 12;
+    const canvasX = stageX + canvasMarginSide;
+    const canvasY = stageY + canvasMarginTop;
+    const canvasW = stageW - canvasMarginSide * 2;
+    const canvasH = stageH * 0.6;
+    const canvasRadius = 12;
+    const tableBg = getBgColor();
+    drawRoundedRectBordered(canvasX, canvasY, canvasW, canvasH, canvasRadius, tableBg, accent, 2);
+
+    // === 5. Floating d8 in the middle of the canvas ===
+    const dieRadius = Math.min(canvasW, canvasH) * 0.26;
+    // Align center on whole pixels to keep edges crisp
+    const dieCenterX = Math.round(canvasX + canvasW / 2) + 0.5;
+    const dieCenterY = Math.round(canvasY + canvasH / 2) + 0.5;
+
+    previewCtx.save();
+    previewCtx.translate(dieCenterX, dieCenterY);
+    const baseRot = -Math.PI / 8; // slight tilt
+
+    const edges = 8;
+    previewCtx.beginPath();
+    for (let i = 0; i < edges; i++) {
+      const angle = baseRot + (Math.PI * 2 * i) / edges;
+      const x = Math.cos(angle) * dieRadius;
+      const y = Math.sin(angle) * dieRadius;
+      if (i === 0) previewCtx.moveTo(x, y);
+      else previewCtx.lineTo(x, y);
+    }
+    previewCtx.closePath();
+    previewCtx.fillStyle = getFaceColor();
+    previewCtx.strokeStyle = getEdgeColor();
+    previewCtx.lineWidth = 3;
+    previewCtx.fill();
+    previewCtx.stroke();
+
+    // d8 face value
+    previewCtx.fillStyle = getEdgeColor();
+    previewCtx.font = 'bold 24px system-ui, sans-serif';
+    previewCtx.textAlign = 'center';
+    previewCtx.textBaseline = 'middle';
+    previewCtx.fillText('5', 0, 2);
+
+    previewCtx.restore();
+
+    // === 6. Dice Results bar (Menus Background with accent border, no label text) ===
+    const resultsMarginX = canvasMarginSide;
+    const resultsMarginTop = 10;
+    const resultsHeight = Math.min(32, stageH * 0.22);
+    const resultsX = stageX + resultsMarginX;
+    const resultsY = canvasY + canvasH + resultsMarginTop;
+    const resultsW = stageW - resultsMarginX * 2;
+    const resultsRadius = 11;
+    drawRoundedRectBordered(resultsX, resultsY, resultsW, resultsHeight, resultsRadius, menuBg, accent, 2);
+
+    // === 7. Pool buttons row below the panel (Buttons/Selector color) ===
+    const poolRowMarginX = 14; // small padding inside panel
+    const poolRowY = panelY + panelH + 10;
+    const poolBtnHeight = 24;
+    const poolBtnRadius = 12;
+    const poolRowWidth = panelW - poolRowMarginX * 2;
+    const poolBtnGap = 10;
+    const poolBtnWidth = (poolRowWidth - 2 * poolBtnGap) / 3;
+    const poolColor = getSelectorColor();
+
+    for (let i = 0; i < 3; i++) {
+      const btnX = panelX + poolRowMarginX + i * (poolBtnWidth + poolBtnGap);
+      const btnY = poolRowY;
+      drawRoundedRect(btnX, btnY, poolBtnWidth, poolBtnHeight, poolBtnRadius, poolColor);
+    }
+  }
+
+
+  function syncColorsFromSliders(){
+  diceFaceColor  = getFaceColor();
+  diceEdgeColor  = getEdgeColor();
+  diceTableColor = getBgColor();
+
+  const accentColor = getAccentColor();
+  const menuBgColor = getMenuBgColor();
+  const rootStyle = document.documentElement.style;
+
+  // New: link accent & menu colors to sliders
+  rootStyle.setProperty('--accent', accentColor);
+  rootStyle.setProperty('--panel',  accentColor);
+  rootStyle.setProperty('--menuBg', menuBgColor);
+
+  updatePageBackground();
+  applySelectorColorToPoolButtons();
+  applyRollColorToActionButtons();
+  drawPreview();
+}
+
+  ['faceH','faceS','faceV','edgeH','edgeS','edgeV','bgH','bgS','bgV','pageBgH','pageBgS','pageBgV','selH','selS','selV','accentH','accentS','accentV','menuBgH','menuBgS','menuBgV','rollH','rollS','rollV']
+    .forEach(id=>{
+      const el = byId(id);
+      if (el){
+        el.addEventListener('input', syncColorsFromSliders);
+      }
+    });
+
+  // Presets
+  let colorPresets = {};
+
+  function getCurrentColorPreset(){
+    const ids = ['faceH','faceS','faceV','edgeH','edgeS','edgeV','bgH','bgS','bgV','pageBgH','pageBgS','pageBgV','selH','selS','selV','accentH','accentS','accentV','menuBgH','menuBgS','menuBgV','rollH','rollS','rollV'];
+    const state = {};
+    ids.forEach(id=>{
+      const el = byId(id);
+      if (el) state[id] = Number(el.value);
+    });
+    return state;
+  }
+
+  function applyColorPreset(state){
+    if (!state) return;
+    Object.keys(state).forEach(id=>{
+      const el = byId(id);
+      if (el) {
+        el.value = state[id];
+      }
+    });
+    syncColorsFromSliders();
+  }
+
+  function refreshPresetSelect(){
+    if (!presetSelect) return;
+    const current = presetSelect.value;
+    presetSelect.innerHTML = '';
+    Object.keys(colorPresets).sort().forEach(name=>{
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      presetSelect.appendChild(opt);
+    });
+    if (current && colorPresets[current]) {
+      presetSelect.value = current;
+    }
+  }
+
+  function loadPresetsFromStorage(){
+    try{
+      const raw = localStorage.getItem(PRESET_STORAGE_KEY);
+      if (raw) {
+        const obj = JSON.parse(raw);
+        if (obj && typeof obj === 'object') {
+          colorPresets = obj;
+
+          // Back-fill any missing color fields (for older saved presets)
+          const ids = ['faceH','faceS','faceV','edgeH','edgeS','edgeV',
+                       'bgH','bgS','bgV',
+                       'pageBgH','pageBgS','pageBgV',
+                       'selH','selS','selV',
+                       'accentH','accentS','accentV',
+                       'menuBgH','menuBgS','menuBgV',
+                       'rollH','rollS','rollV'];
+
+          Object.keys(colorPresets).forEach(name=>{
+            const preset = colorPresets[name];
+            if (!preset || typeof preset !== 'object') return;
+            ids.forEach(id=>{
+              if (!(id in preset)) {
+                const el = byId(id);
+                if (el) preset[id] = Number(el.value);
+              }
+            });
+          });
+        }
+      }
+    }catch(e){}
+    refreshPresetSelect();
+  }
+
+  function savePresetsToStorage(){
+    try{
+      localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(colorPresets));
+    }catch(e){}
+  }
+
+  if (savePresetBtn) {
+    savePresetBtn.addEventListener('click', ()=>{
+      const name = (presetNameInput.value || '').trim();
+      if (!name) return;
+      colorPresets[name] = getCurrentColorPreset();
+      savePresetsToStorage();
+      refreshPresetSelect();
+      presetSelect.value = name;
+    });
+  }
+
+  if (loadPresetBtn) {
+    loadPresetBtn.addEventListener('click', ()=>{
+      const name = presetSelect.value;
+      if (!name || !colorPresets[name]) return;
+      applyColorPreset(colorPresets[name]);
+    });
+  }
+
+  if (deletePresetBtn) {
+    deletePresetBtn.addEventListener('click', ()=>{
+      const name = presetSelect.value;
+      if (!name || !colorPresets[name] || name === 'default') return;
+      delete colorPresets[name];
+      savePresetsToStorage();
+      refreshPresetSelect();
+      if (presetNameInput.value === name) {
+        presetNameInput.value = '';
+      }
+    });
+  }
+
+  loadPresetsFromStorage();
+
+  // If no presets saved yet, create "default" from current theme
+  if (!colorPresets || Object.keys(colorPresets).length === 0 || !colorPresets['default']) {
+    colorPresets = colorPresets || {};
+    colorPresets['default'] = getCurrentColorPreset();
+    savePresetsToStorage();
+  }
+  refreshPresetSelect();
+  if (presetSelect && !presetSelect.value && colorPresets['default']) {
+    presetSelect.value = 'default';
+  }
+  // Apply current (which is default) to ensure theme sync
+  applyColorPreset(colorPresets['default'] || getCurrentColorPreset());
+
+  // Color drawer open/close
+  function openColorDrawer(){
+    colorBackdrop.classList.add('show');
+    colorDrawer.classList.add('open');
+    colorDrawer.setAttribute('aria-hidden','false');
+  }
+  function closeColorDrawer(){
+    colorBackdrop.classList.remove('show');
+    colorDrawer.classList.remove('open');
+    colorDrawer.setAttribute('aria-hidden','true');
+  }
+  openColorsBtn.addEventListener('click', openColorDrawer);
+  closeColorDrawerBtn.addEventListener('click', closeColorDrawer);
+  colorBackdrop.addEventListener('click', closeColorDrawer);
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && colorDrawer.classList.contains('open')){
+      closeColorDrawer();
+    }
+  });
+
+  // ---------- Init ----------
+  initPhysicsDiceCanvas();
+  renderPoolButtons();
+  renderDrawer();
+  renderHistory();
+  syncColorsFromSliders(); // ensure dice + UI colors match sliders on load
+})();
+</script>
+</body>
+</html>
