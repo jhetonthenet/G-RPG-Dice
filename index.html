@@ -7,10 +7,9 @@
 <meta name="theme-color" content="#0b1220" />
 <style>
   :root{
-    --bg:#020617; --fg:#e5e7eb; --muted:#9ca3af;
+    --bg:#0b1220; --fg:#e5e7eb; --muted:#9ca3af;
     --accent:#22d3ee; --panel:#111827; --btn:#1f2937;
     --ring:#38bdf8; --ok:#22c55e; --warn:#f59e0b;
-    --menuBg:#020617;
   }
   html,body{height:100%}
   body{
@@ -27,7 +26,7 @@
   .header-spacer{margin-left:auto; display:flex; gap:8px; align-items:center;}
 
   .app{max-width:920px; margin:0 auto; padding:14px}
-  .panel{background:var(--panel); backdrop-filter: blur(6px); border:1px solid rgba(56,189,248,.18); border-radius:16px; padding:12px}
+  .panel{background:rgba(17,24,39,.72); backdrop-filter: blur(6px); border:1px solid rgba(56,189,248,.18); border-radius:16px; padding:12px}
   .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
   .row + .row{margin-top:10px}
   .tiny{font-size:11px}
@@ -60,14 +59,7 @@
   .sum{font-size:22px; font-weight:900}
   .muted{color:var(--muted)}
   .history{max-height:240px; overflow:auto; padding-right:6px}
-  .hist-item{
-  border:1px solid var(--accent);
-  border-radius:12px;
-  padding:10px;
-  margin-bottom:8px;
-  background:var(--menuBg);
-  color:#ffffff;
-}
+  .hist-item{border:1px solid rgba(148,163,184,.25); border-radius:12px; padding:10px; margin-bottom:8px; background:#0b1220; color:#ffffff}
   .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
   .divider{height:1px; background:rgba(148,163,184,.25); margin:8px 0}
   footer{padding:16px 14px 26px; color:var(--muted); text-align:center}
@@ -80,7 +72,7 @@
   .drawer.open .scrim{opacity:1}
   .sheet{
     position:absolute; top:0; bottom:0; left:0; width:320px; max-width:85%;
-    background:var(--menuBg); border-right:1px solid rgba(56,189,248,.25);
+    background:#0b1220; border-right:1px solid rgba(56,189,248,.25);
     transform:translateX(-100%); transition:.22s; overflow:auto; color:#ffffff;
   }
   .drawer.open .sheet{transform:none}
@@ -89,14 +81,14 @@
   .sheet .toolrow.range-row{flex-direction:column; align-items:stretch; padding-top:12px;}
   .sheet .toolrow.range-row label{width:100%; color:var(--muted); font-size:12px;}
   .sheet input[type=range]{width:100%;}
-  .search{width:100%; background:var(--menuBg); color:#ffffff; border:1px solid rgba(148,163,184,.25); border-radius:10px; padding:8px 10px}
+  .search{width:100%; background:#0b1020; color:#ffffff; border:1px solid rgba(148,163,184,.25); border-radius:10px; padding:8px 10px}
   .pool-list{padding:8px 12px 14px; display:grid; gap:8px}
-  .pool-item{display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; border:1px solid rgba(148,163,184,.2); background:var(--menuBg); color:#ffffff}
+  .pool-item{display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; border:1px solid rgba(148,163,184,.2); background:#0b1020; color:#ffffff}
   .pool-item input{width:18px; height:18px}
 
   .crit{font-weight:800}
   .breakdown{display:grid; gap:6px}
-  .die-line{padding:6px 8px; border:1px solid rgba(148,163,184,.25); border-radius:10px; background:var(--menuBg); color:#ffffff}
+  .die-line{padding:6px 8px; border:1px solid rgba(148,163,184,.25); border-radius:10px; background:#0b1020; color:#ffffff}
   .controls{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   .pill{font-size:12px; padding:4px 8px; border:1px solid rgba(148,163,184,.25); border-radius:999px; color:var(--muted)}
 
@@ -104,9 +96,9 @@
   .dice-stage{
     margin-top:10px;
     border-radius:14px;
-    border:1px solid var(--accent);
+    border:1px solid rgba(148,163,184,.35);
     padding:8px;
-    background:var(--menuBg);
+    background:radial-gradient(circle at top,#111827,#020617);
   }
   #diceCanvas{
     width:100%;
@@ -114,7 +106,7 @@
     height:220px;
     display:block;
     border-radius:10px;
-    border:1px solid var(--accent);
+    border:1px solid rgba(15,23,42,.8);
     background:radial-gradient(circle at top,#0f172a,#020617);
   }
 
@@ -122,12 +114,12 @@
   .breakdown-details{
     margin-top:8px;
     border-radius:10px;
-    border:1px solid var(--menuBg);
+    border:1px solid rgba(148,163,184,.35);
     padding:6px 8px;
-    background:var(--menuBg);
+    background:rgba(15,23,42,0.9);
   }
   .breakdown-details[open]{
-    background:var(--menuBg);
+    background:rgba(15,23,42,1);
   }
   .breakdown-details summary{
     list-style:none;
@@ -170,12 +162,12 @@
     top:50%;
     left:50%;
     transform:translate(-50%,-50%) scale(.96);
-    background:var(--menuBg);
+    background:#020617;
     border-radius:14px;
     border:1px solid rgba(148,163,184,.45);
     box-shadow:0 18px 40px rgba(0,0,0,.8);
     padding:14px 16px 16px;
-    width:min(960px,96vw);
+    width:min(720px,96vw);
     max-height:90vh;
     overflow-y:auto;
     display:flex;
@@ -240,7 +232,7 @@
   .color-group{
     padding:10px 12px;
     border-radius:10px;
-    background:var(--menuBg);
+    background:#020617;
     border:1px solid rgba(55,65,81,0.9);
     display:flex;
     flex-direction:column;
@@ -253,18 +245,40 @@
     color:#e5e7eb;
   }
   
-  .color-group details{
-    border:none;
-    padding:0;
-  }
-  .color-group summary{
-    list-style:none;
-    cursor:pointer;
-    outline:none;
-  }
-  .color-group summary::-webkit-details-marker{
-    display:none;
-  }
+.color-group details{
+  border:none;
+  padding:0;
+}
+
+/* Make the summary look like a row with text on the left and icon on the right */
+.color-group summary{
+  list-style:none;
+  cursor:pointer;
+  outline:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* Hide the browser’s default marker */
+.color-group summary::-webkit-details-marker{
+  display:none;
+}
+
+/* Little triangle on the right */
+.color-group summary::after{
+  content: '▾';           /* down-pointing triangle */
+  font-size:20px;
+  color:#9ca3af;
+  margin-left:8px;
+  transition:transform .15s ease;
+}
+
+/* Rotate the triangle when the section is open */
+.color-group details[open] > summary::after{
+  transform:rotate(180deg);
+}
+
 .slider-row{
     display:flex;
     align-items:center;
@@ -294,8 +308,8 @@
     width:100%;
     padding:8px 10px;
     border-radius:8px;
-    border:1px solid var(--accent);
-    background:var(--menuBg);
+    border:1px solid rgba(75,85,99,0.9);
+    background:#020617;
     color:#e5e7eb;
     font-size:13px;
   }
@@ -309,8 +323,8 @@
     padding:6px 10px;
     font-size:13px;
     border-radius:8px;
-    background:var(--panel);
-    border:1px solid var(--accent);
+    background:#111827;
+    border:1px solid rgba(75,85,99,0.9);
     color:#e5e7eb;
     box-shadow:none;
   }
@@ -321,8 +335,8 @@
     width:100%;
     max-height:140px;
     border-radius:8px;
-    border:1px solid var(--accent);
-    background:var(--menuBg);
+    border:1px solid rgba(75,85,99,0.9);
+    background:#020617;
     color:#e5e7eb;
     font-size:13px;
     padding:6px 8px;
@@ -350,7 +364,6 @@
           <div class="sum" id="sum">—</div>
         </div>
         <div class="controls">
-          <button id="copyLast" class="btn small" title="Copy last roll">Copy Last</button>
           <button id="clearView" class="btn small ghost" title="Clear results view">Clear View</button>
         </div>
       </div>
@@ -429,171 +442,189 @@
   </div>
 
   <div class="drawer-content">
-    <!-- Left: presets -->
-    <div class="drawer-column drawer-column-presets">
-      <div class="color-group">
-        <div class="color-group-title">Presets</div>
-        <input id="presetName" class="preset-name-input" type="text" placeholder="Preset name">
-        <div class="preset-controls-row">
-          <button type="button" id="savePresetBtn" class="preset-btn">Save</button>
-          <button type="button" id="loadPresetBtn" class="preset-btn">Load</button>
-          <button type="button" id="deletePresetBtn" class="preset-btn">Delete</button>
-        </div>
-        <select id="presetSelect" size="7"></select>
+<!-- Left: presets -->
+  <div class="drawer-column drawer-column-presets">
+    <div class="color-group">
+      <div class="color-group-title">Presets</div>
+      <input id="presetName" class="preset-name-input" type="text" placeholder="Preset name">
+      <div class="preset-controls-row">
+        <button type="button" id="savePresetBtn" class="preset-btn">Save</button>
+        <button type="button" id="loadPresetBtn" class="preset-btn">Load</button>
+        <button type="button" id="deletePresetBtn" class="preset-btn">Delete</button>
       </div>
-    </div>
+      <select id="presetSelect" size="7"></select>
+    </div> <!-- end .color-group -->
+  </div> <!-- end .drawer-column-presets -->
 
-    <!-- Right: preview + sliders -->
-    <div class="drawer-column drawer-column-sliders">
-      <div id="color-controls">
-        <div class="slider-block">
-          <canvas id="colorPreview" width="440" height="260"></canvas>
-          <div id="colorPanel" style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Dice Face</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="faceH" min="0" max="360" value="190">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="faceS" min="0" max="100" value="75">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="faceV" min="0" max="100" value="90">
-                </div>
-              </details>
+<!-- Right: preview + sliders -->
+<div class="drawer-column drawer-column-sliders">
+  <div id="color-controls">
+    <div class="slider-block">
+      <canvas id="colorPreview" width="440" height="260"></canvas>
+      <div id="colorPanel" style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        <div class="color-group">
+          <details>
+            <summary class="color-group-title">Dice Face</summary>
+            <div class="slider-row">
+              <span>H</span>
+              <input type="range" id="faceH" min="0" max="360" value="190">
             </div>
+            <div class="slider-row">
+              <span>S</span>
+              <input type="range" id="faceS" min="0" max="100" value="75">
+            </div>
+            <div class="slider-row">
+              <span>V</span>
+              <input type="range" id="faceV" min="0" max="100" value="90">
+            </div>
+          </details>
+        </div>
 
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Dice Number / Edges</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="edgeH" min="0" max="360" value="210">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="edgeS" min="0" max="100" value="15">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="edgeV" min="0" max="100" value="98">
-                </div>
-              </details>
+        <div class="color-group">
+          <details>
+            <summary class="color-group-title">Dice Number / Edges</summary>
+            <div class="slider-row">
+              <span>H</span>
+              <input type="range" id="edgeH" min="0" max="360" value="210">
             </div>
+            <div class="slider-row">
+              <span>S</span>
+              <input type="range" id="edgeS" min="0" max="100" value="15">
+            </div>
+            <div class="slider-row">
+              <span>V</span>
+              <input type="range" id="edgeV" min="0" max="100" value="98">
+            </div>
+          </details>
+        </div>
 
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Dice Table Background</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="bgH" min="0" max="360" value="220">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="bgS" min="0" max="100" value="40">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="bgV" min="0" max="100" value="14">
-                </div>
-              </details>
+        <div class="color-group">
+          <details>
+            <summary class="color-group-title">Dice Table Background</summary>
+            <div class="slider-row">
+              <span>H</span>
+              <input type="range" id="bgH" min="0" max="360" value="220">
             </div>
+            <div class="slider-row">
+              <span>S</span>
+              <input type="range" id="bgS" min="0" max="100" value="40">
+            </div>
+            <div class="slider-row">
+              <span>V</span>
+              <input type="range" id="bgV" min="0" max="100" value="14">
+            </div>
+          </details>
+        </div>
 
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Page Background</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="pageBgH" min="0" max="360" value="220">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="pageBgS" min="0" max="100" value="45">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="pageBgV" min="0" max="100" value="14">
-                </div>
-              </details>
+        <div class="color-group">
+          <details>
+            <summary class="color-group-title">Page Background</summary>
+            <div class="slider-row">
+              <span>H</span>
+              <input type="range" id="pageBgH" min="0" max="360" value="220">
             </div>
+            <div class="slider-row">
+              <span>S</span>
+              <input type="range" id="pageBgS" min="0" max="100" value="45">
+            </div>
+            <div class="slider-row">
+              <span>V</span>
+              <input type="range" id="pageBgV" min="0" max="100" value="14">
+            </div>
+          </details>
+        </div>
 
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Buttons</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="selH" min="0" max="360" value="200">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="selS" min="0" max="100" value="25">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="selV" min="0" max="100" value="28">
-                </div>
-              </details>
+        <div class="color-group">
+          <details>
+            <summary class="color-group-title">Buttons</summary>
+            <div class="slider-row">
+              <span>H</span>
+              <input type="range" id="selH" min="0" max="360" value="200">
             </div>
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Accents</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="accentH" min="0" max="360" value="220">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="accentS" min="0" max="100" value="20">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="accentV" min="0" max="100" value="40">
-                </div>
-              </details>
+            <div class="slider-row">
+              <span>S</span>
+              <input type="range" id="selS" min="0" max="100" value="25">
             </div>
-
-            <div class="color-group">
-              <details open>
-                <summary class="color-group-title">Menus Background</summary>
-                <div class="slider-row">
-                  <span>H</span>
-                  <input type="range" id="menuBgH" min="0" max="360" value="230">
-                </div>
-                <div class="slider-row">
-                  <span>S</span>
-                  <input type="range" id="menuBgS" min="0" max="100" value="90">
-                </div>
-                <div class="slider-row">
-                  <span>V</span>
-                  <input type="range" id="menuBgV" min="0" max="100" value="10">
-                </div>
-              </details>
+            <div class="slider-row">
+              <span>V</span>
+              <input type="range" id="selV" min="0" max="100" value="28">
             </div>
-
-          </div>
+          </details>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+
 <script>
 (function(){
   // ---------- Data ----------
-  const POOLS = [
-    "1d4","1d6","1d8","1d4+1d6","2d6","1d6+1d8","2d8","3d6",
-    "1d6+2d8","4d6","3d6+1d8","2d6+2d8","5d6","4d8","3d6+2d8","6d6",
-    "5d6+1d8","5d8","7d6","6d6+1d8","5d6+2d8","8d6","3d6+4d8","2d6+5d8",
-    "9d6","7d8","3d6+5d8","10d6","5d6+4d8","8d8","11d6","6d6+4d8",
-    "5d6+5d8","9d8","7d6+4d8","6d6+5d8","5d6+6d8","10d8","7d6+5d8","14d6",
-    "5d6+7d8","11d8","15d6","6d6+7d8","9d6+5d8","12d8","7d6+7d8","10d6+5d8",
-    "17d6","13d8","7d6+8d8","18d6","9d6+7d8","14d8","19d6","10d6+7d8",
-    "9d6+8d8","15d8","7d6+10d8","6d6+11d8"
-  ];
+const POOLS = [
+  "1d4",            // 1
+  "1d6",            // 2
+  "1d8",            // 3
+  "1d12",           // 4
+  "1d12 + 1d4",     // 5
+  "1d12 + 1d6",     // 6
+  "1d12 + 1d8",     // 7
+  "2d12",           // 8
+  "2d12 + 1d4",     // 9
+  "2d12 + 1d6",     // 10
+  "2d12 + 1d8",     // 11
+  "3d12",           // 12
+  "3d12 + 1d4",     // 13
+  "3d12 + 1d6",     // 14
+  "3d12 + 1d8",     // 15
+  "4d12",           // 16
+  "4d12 + 1d4",     // 17
+  "4d12 + 1d6",     // 18
+  "4d12 + 1d8",     // 19
+  "5d12",           // 20
+
+  "5d12 + 1d4",     // 21
+  "5d12 + 1d6",     // 22
+  "5d12 + 1d8",     // 23
+  "6d12",           // 24
+  "6d12 + 1d4",     // 25
+  "6d12 + 1d6",     // 26
+  "6d12 + 1d8",     // 27
+  "7d12",           // 28
+  "7d12 + 1d4",     // 29
+  "7d12 + 1d6",     // 30
+  "7d12 + 1d8",     // 31
+  "8d12",           // 32
+  "8d12 + 1d4",     // 33
+  "8d12 + 1d6",     // 34
+  "8d12 + 1d8",     // 35
+  "9d12",           // 36
+  "9d12 + 1d4",     // 37
+  "9d12 + 1d6",     // 38
+  "9d12 + 1d8",     // 39
+  "10d12",          // 40
+
+  "10d12 + 1d4",    // 41
+  "10d12 + 1d6",    // 42
+  "10d12 + 1d8",    // 43
+  "11d12",          // 44
+  "11d12 + 1d4",    // 45
+  "11d12 + 1d6",    // 46
+  "11d12 + 1d8",    // 47
+  "12d12",          // 48
+  "12d12 + 1d4",    // 49
+  "12d12 + 1d6",    // 50
+  "12d12 + 1d8",    // 51
+  "13d12",          // 52
+  "13d12 + 1d4",    // 53
+  "13d12 + 1d6",    // 54
+  "13d12 + 1d8",    // 55
+  "14d12",          // 56
+  "14d12 + 1d4",    // 57
+  "14d12 + 1d6",    // 58
+  "14d12 + 1d8",    // 59
+  "15d12"           // 60
+];
+
   const DEFAULT_VISIBLE = new Set([1,2,3,4,5,6,7,8]);
 
   // ---------- DOM ----------
@@ -608,7 +639,6 @@
   const timeMetaEl   = byId('timeMeta');
   const breakdownSummaryEl = byId('breakdownSummary');
 
-  const copyBtn         = byId('copyLast');
   const clearViewBtn    = byId('clearView');
   const clearHistoryBtn = byId('clearHistory');
 
@@ -635,8 +665,6 @@
   const bgH    = byId('bgH'),    bgS    = byId('bgS'),    bgV    = byId('bgV');
   const pageBgH= byId('pageBgH'),pageBgS= byId('pageBgS'),pageBgV= byId('pageBgV');
   const selH   = byId('selH'),   selS   = byId('selS'),   selV   = byId('selV');
-  const accentH= byId('accentH'),accentS= byId('accentS'),accentV= byId('accentV');
-  const menuBgH= byId('menuBgH'),menuBgS= byId('menuBgS'),menuBgV= byId('menuBgV');
   const rollH  = byId('rollH'),  rollS  = byId('rollS'),  rollV  = byId('rollV');
 
   const presetSelect      = byId('presetSelect');
@@ -864,8 +892,9 @@
         body = Bodies.fromVertices(startX, startY, [verts], {
           restitution:0.3, friction:0.35, frictionAir:0.01, density:0.002
         }, true);
-      } else if (sides === 8){
-        body = Bodies.polygon(startX, startY, 8, radius, {
+      } else if (sides === 8 || sides === 12){
+        const polyRadius = (sides === 12 ? radius * 0.9 : radius);
+        body = Bodies.polygon(startX, startY, sides, polyRadius, {
           restitution:0.3, friction:0.35, frictionAir:0.01, density:0.002
         });
       } else {
@@ -880,7 +909,7 @@
 
       let spinMin = 0.10;
       let spinMax = 0.30;
-      if (sides === 8){
+      if (sides === 8 || sides === 12){
         spinMin = 0.02;
         spinMax = 0.04;
       }
@@ -962,7 +991,7 @@
       }
 
       const baseMaxAngular = 0.5;
-      const dieMaxAngular  = (die.sides === 8) ? 0.22 : baseMaxAngular;
+      const dieMaxAngular  = (die.sides === 8 || die.sides === 12) ? 0.22 : baseMaxAngular;
       if (Math.abs(body.angularVelocity) > dieMaxAngular){
         Body.setAngularVelocity(body, Math.sign(body.angularVelocity)*dieMaxAngular);
       }
@@ -1169,17 +1198,6 @@
     if (navigator.vibrate) navigator.vibrate(15);
   }
 
-  copyBtn.addEventListener('click', ()=>{
-    if(!lastRoll) return;
-    const text =
-`${lastRoll.poolName} • ${lastRoll.formula}
-Crit Roll: ${z2(lastRoll.crit)}%
-Total: ${lastRoll.total}
-${lastRoll.lines.join('\n')}`;
-    navigator.clipboard?.writeText(text);
-    if (navigator.vibrate) navigator.vibrate(10);
-  });
-
   clearViewBtn.addEventListener('click', ()=>{
     sumEl.textContent     = '—';
     critEl.textContent    = '—';
@@ -1276,12 +1294,6 @@ ${lastRoll.lines.join('\n')}`;
   function getSelectorColor(){
     return HSVtoRGB(Number(selH.value), Number(selS.value), Number(selV.value));
   }
-  function getAccentColor(){
-    return HSVtoRGB(Number(accentH.value), Number(accentS.value), Number(accentV.value));
-  }
-  function getMenuBgColor(){
-    return HSVtoRGB(Number(menuBgH.value), Number(menuBgS.value), Number(menuBgV.value));
-  }
 
   function updatePageBackground(){
     document.body.style.background = getPageBgColor();
@@ -1293,207 +1305,106 @@ ${lastRoll.lines.join('\n')}`;
     });
   }
   function applyRollColorToActionButtons(){
-  const color = getRollColor();
-
-  // Main app buttons (non-ghost)
-  document.querySelectorAll('.btn:not(.ghost)').forEach(btn=>{
-    btn.style.background = color;
-  });
-
-  // Preset buttons inside the color drawer
-  document.querySelectorAll('.color-drawer button.preset-btn').forEach(btn=>{
-    btn.style.background = color;
-  });
-}
+    const color = getRollColor();
+    document.querySelectorAll('.btn').forEach(btn=>{
+      btn.style.background = color;
+    });
+  }
 
   let previewCtx = previewCanvas ? previewCanvas.getContext('2d') : null;
 
-  // HiDPI setup for crisp preview rendering
-  function setupPreviewCanvas(){
-    if (!previewCanvas || !previewCtx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = previewCanvas.getBoundingClientRect();
-    const width = rect.width || previewCanvas.width || 440;
-    const height = rect.height || previewCanvas.height || 260;
-    previewCanvas.width = width * dpr;
-    previewCanvas.height = height * dpr;
-    previewCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  window.addEventListener('resize', setupPreviewCanvas);
-  setupPreviewCanvas();
-
   function drawPreview() {
     if (!previewCtx) return;
+    const w = previewCanvas.width;
+    const h = previewCanvas.height;
 
-    // Use CSS size for logical drawing area so everything stays crisp with HiDPI transform
-    const rect = previewCanvas.getBoundingClientRect();
-    const w = rect.width || previewCanvas.width;
-    const h = rect.height || previewCanvas.height;
-
-    previewCtx.clearRect(0, 0, w, h);
-
-    // Helper to draw rounded rectangles (fill only)
-    function drawRoundedRect(px, py, width, height, radius, fillColor) {
-      const r = Math.min(radius, height / 2, width / 2);
-      previewCtx.beginPath();
-      previewCtx.moveTo(px + r, py);
-      previewCtx.lineTo(px + width - r, py);
-      previewCtx.quadraticCurveTo(px + width, py, px + width, py + r);
-      previewCtx.lineTo(px + width, py + height - r);
-      previewCtx.quadraticCurveTo(px + width, py + height, px + width - r, py + height);
-      previewCtx.lineTo(px + r, py + height);
-      previewCtx.quadraticCurveTo(px, py + height, px, py + height - r);
-      previewCtx.lineTo(px, py + r);
-      previewCtx.quadraticCurveTo(px, py, px + r, py);
-      previewCtx.closePath();
-      previewCtx.fillStyle = fillColor;
-      previewCtx.fill();
-    }
-
-    // Helper to draw rounded rectangles with border
-    function drawRoundedRectBordered(px, py, width, height, radius, fillColor, strokeColor, lineWidth = 2) {
-      const r = Math.min(radius, height / 2, width / 2);
-      previewCtx.beginPath();
-      previewCtx.moveTo(px + r, py);
-      previewCtx.lineTo(px + width - r, py);
-      previewCtx.quadraticCurveTo(px + width, py, px + width, py + r);
-      previewCtx.lineTo(px + width, py + height - r);
-      previewCtx.quadraticCurveTo(px + width, py + height, px + width - r, py + height);
-      previewCtx.lineTo(px + r, py + height);
-      previewCtx.quadraticCurveTo(px, py + height, px, py + height - r);
-      previewCtx.lineTo(px, py + r);
-      previewCtx.quadraticCurveTo(px, py, px + r, py);
-      previewCtx.closePath();
-      previewCtx.fillStyle = fillColor;
-      previewCtx.fill();
-      previewCtx.lineWidth = lineWidth;
-      previewCtx.strokeStyle = strokeColor;
-      previewCtx.stroke();
-    }
-
-    // === 1. Page background (outer world) ===
+    // Page background
     previewCtx.fillStyle = getPageBgColor();
     previewCtx.fillRect(0, 0, w, h);
 
-    // === 2. Main results panel (uses accent/panel color) ===
-    const panelMargin = 14;
-    const panelX = panelMargin;
-    const panelY = 12;
-    const panelW = w - panelMargin * 2;
-    const panelH = h * 0.78;
-    const panelRadius = 18;
-    const panelColor = getAccentColor();
-    drawRoundedRect(panelX, panelY, panelW, panelH, panelRadius, panelColor);
+    // Dice table area
+    const tableMargin = 12;
+    const tableX = tableMargin;
+    const tableY = tableMargin;
+    const tableW = w - tableMargin * 2;
+    const tableH = h * 0.55;
+    previewCtx.fillStyle = getBgColor();
+    previewCtx.fillRect(tableX, tableY, tableW, tableH);
 
-    // === 3. Dice-stage frame (Menus Background with accent border) ===
-    const stageMarginSide = 14;
-    const stageMarginTop = 34; // small header gap
-    const stageMarginBottom = 16;
-    const stageX = panelX + stageMarginSide;
-    const stageY = panelY + stageMarginTop;
-    const stageW = panelW - stageMarginSide * 2;
-    const stageH = panelH - stageMarginTop - stageMarginBottom;
-    const stageRadius = 16;
-    const menuBg = getMenuBgColor();
-    const accent = getAccentColor();
-    drawRoundedRectBordered(stageX, stageY, stageW, stageH, stageRadius, menuBg, accent, 2);
-
-    // === 4. Actual dice canvas area (Dice Table Background with accent border) ===
-    const canvasMarginSide = 12;
-    const canvasMarginTop = 12;
-    const canvasX = stageX + canvasMarginSide;
-    const canvasY = stageY + canvasMarginTop;
-    const canvasW = stageW - canvasMarginSide * 2;
-    const canvasH = stageH * 0.6;
-    const canvasRadius = 12;
-    const tableBg = getBgColor();
-    drawRoundedRectBordered(canvasX, canvasY, canvasW, canvasH, canvasRadius, tableBg, accent, 2);
-
-    // === 5. Floating d8 in the middle of the canvas ===
-    const dieRadius = Math.min(canvasW, canvasH) * 0.26;
-    // Align center on whole pixels to keep edges crisp
-    const dieCenterX = Math.round(canvasX + canvasW / 2) + 0.5;
-    const dieCenterY = Math.round(canvasY + canvasH / 2) + 0.5;
+    // Mini die
+    const size = Math.min(tableW, tableH) * 0.33;
+    const x = w / 2;
+    const y = tableY + tableH * 0.5;
+    const half = size / 2;
 
     previewCtx.save();
-    previewCtx.translate(dieCenterX, dieCenterY);
-    const baseRot = -Math.PI / 8; // slight tilt
+    previewCtx.translate(x, y);
+    previewCtx.rotate(-0.3);
 
-    const edges = 8;
-    previewCtx.beginPath();
-    for (let i = 0; i < edges; i++) {
-      const angle = baseRot + (Math.PI * 2 * i) / edges;
-      const x = Math.cos(angle) * dieRadius;
-      const y = Math.sin(angle) * dieRadius;
-      if (i === 0) previewCtx.moveTo(x, y);
-      else previewCtx.lineTo(x, y);
-    }
-    previewCtx.closePath();
     previewCtx.fillStyle = getFaceColor();
     previewCtx.strokeStyle = getEdgeColor();
     previewCtx.lineWidth = 3;
+
+    previewCtx.beginPath();
+    previewCtx.moveTo(-half, -half);
+    previewCtx.lineTo(half, -half);
+    previewCtx.lineTo(half, half);
+    previewCtx.lineTo(-half, half);
+    previewCtx.closePath();
     previewCtx.fill();
     previewCtx.stroke();
 
-    // d8 face value
     previewCtx.fillStyle = getEdgeColor();
     previewCtx.font = 'bold 24px system-ui, sans-serif';
     previewCtx.textAlign = 'center';
     previewCtx.textBaseline = 'middle';
-    previewCtx.fillText('5', 0, 2);
+    previewCtx.fillText('5', 0, 0);
 
     previewCtx.restore();
 
-    // === 6. Dice Results bar (Menus Background with accent border, no label text) ===
-    const resultsMarginX = canvasMarginSide;
-    const resultsMarginTop = 10;
-    const resultsHeight = Math.min(32, stageH * 0.22);
-    const resultsX = stageX + resultsMarginX;
-    const resultsY = canvasY + canvasH + resultsMarginTop;
-    const resultsW = stageW - resultsMarginX * 2;
-    const resultsRadius = 11;
-    drawRoundedRectBordered(resultsX, resultsY, resultsW, resultsHeight, resultsRadius, menuBg, accent, 2);
+    // Buttons
+    const btnPaddingX = 8;
+    const btnPaddingY = 6;
+    const btnRadius = 999;
+    const btnHeight = 26;
+    const buttonsY = h - btnHeight - btnPaddingY;
+    const btnWidth = (w - btnPaddingX * 3) / 2;
 
-    // === 7. Pool buttons row below the panel (Buttons/Selector color) ===
-    const poolRowMarginX = 14; // small padding inside panel
-    const poolRowY = panelY + panelH + 10;
-    const poolBtnHeight = 24;
-    const poolBtnRadius = 12;
-    const poolRowWidth = panelW - poolRowMarginX * 2;
-    const poolBtnGap = 10;
-    const poolBtnWidth = (poolRowWidth - 2 * poolBtnGap) / 3;
-    const poolColor = getSelectorColor();
-
-    for (let i = 0; i < 3; i++) {
-      const btnX = panelX + poolRowMarginX + i * (poolBtnWidth + poolBtnGap);
-      const btnY = poolRowY;
-      drawRoundedRect(btnX, btnY, poolBtnWidth, poolBtnHeight, poolBtnRadius, poolColor);
+    function drawRoundedRect(px, py, width, height, radius, color) {
+      const r = Math.min(radius, height / 2, width / 2);
+      previewCtx.beginPath();
+      previewCtx.moveTo(px + r, py);
+      previewCtx.lineTo(px + width - r, py);
+      previewCtx.quadraticCurveTo(px + width, py, px + width, py + r);
+      previewCtx.lineTo(px + width, py + height - r);
+      previewCtx.quadraticCurveTo(px + width, py + height, px + width - r, py + height);
+      previewCtx.lineTo(px + r, py + height);
+      previewCtx.quadraticCurveTo(px, py + height, px, py + height - r);
+      previewCtx.lineTo(px, py + r);
+      previewCtx.quadraticCurveTo(px, py, px + r, py);
+      previewCtx.closePath();
+      previewCtx.fillStyle = color;
+      previewCtx.fill();
     }
+
+    const poolX = btnPaddingX;
+    drawRoundedRect(poolX, buttonsY, btnWidth, btnHeight, btnRadius, getSelectorColor());
+
+    const rollX = poolX + btnWidth + btnPaddingX;
+    drawRoundedRect(rollX, buttonsY, btnWidth, btnHeight, btnRadius, getRollColor());
   }
 
-
   function syncColorsFromSliders(){
-  diceFaceColor  = getFaceColor();
-  diceEdgeColor  = getEdgeColor();
-  diceTableColor = getBgColor();
+    diceFaceColor  = getFaceColor();
+    diceEdgeColor  = getEdgeColor();
+    diceTableColor = getBgColor();
+    updatePageBackground();
+    applySelectorColorToPoolButtons();
+    applyRollColorToActionButtons();
+    drawPreview();
+  }
 
-  const accentColor = getAccentColor();
-  const menuBgColor = getMenuBgColor();
-  const rootStyle = document.documentElement.style;
-
-  // New: link accent & menu colors to sliders
-  rootStyle.setProperty('--accent', accentColor);
-  rootStyle.setProperty('--panel',  accentColor);
-  rootStyle.setProperty('--menuBg', menuBgColor);
-
-  updatePageBackground();
-  applySelectorColorToPoolButtons();
-  applyRollColorToActionButtons();
-  drawPreview();
-}
-
-  ['faceH','faceS','faceV','edgeH','edgeS','edgeV','bgH','bgS','bgV','pageBgH','pageBgS','pageBgV','selH','selS','selV','accentH','accentS','accentV','menuBgH','menuBgS','menuBgV','rollH','rollS','rollV']
+  ['faceH','faceS','faceV','edgeH','edgeS','edgeV','bgH','bgS','bgV','pageBgH','pageBgS','pageBgV','selH','selS','selV','rollH','rollS','rollV']
     .forEach(id=>{
       const el = byId(id);
       if (el){
@@ -1505,7 +1416,7 @@ ${lastRoll.lines.join('\n')}`;
   let colorPresets = {};
 
   function getCurrentColorPreset(){
-    const ids = ['faceH','faceS','faceV','edgeH','edgeS','edgeV','bgH','bgS','bgV','pageBgH','pageBgS','pageBgV','selH','selS','selV','accentH','accentS','accentV','menuBgH','menuBgS','menuBgV','rollH','rollS','rollV'];
+    const ids = ['faceH','faceS','faceV','edgeH','edgeS','edgeV','bgH','bgS','bgV','pageBgH','pageBgS','pageBgV','selH','selS','selV','rollH','rollS','rollV'];
     const state = {};
     ids.forEach(id=>{
       const el = byId(id);
@@ -1547,26 +1458,6 @@ ${lastRoll.lines.join('\n')}`;
         const obj = JSON.parse(raw);
         if (obj && typeof obj === 'object') {
           colorPresets = obj;
-
-          // Back-fill any missing color fields (for older saved presets)
-          const ids = ['faceH','faceS','faceV','edgeH','edgeS','edgeV',
-                       'bgH','bgS','bgV',
-                       'pageBgH','pageBgS','pageBgV',
-                       'selH','selS','selV',
-                       'accentH','accentS','accentV',
-                       'menuBgH','menuBgS','menuBgV',
-                       'rollH','rollS','rollV'];
-
-          Object.keys(colorPresets).forEach(name=>{
-            const preset = colorPresets[name];
-            if (!preset || typeof preset !== 'object') return;
-            ids.forEach(id=>{
-              if (!(id in preset)) {
-                const el = byId(id);
-                if (el) preset[id] = Number(el.value);
-              }
-            });
-          });
         }
       }
     }catch(e){}
