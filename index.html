@@ -44,7 +44,6 @@
   .btn.small{padding:6px 10px; font-weight:600}
   #openColors{padding:12px 20px; font-size:14px;}
 
-
   .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px}
   .pool-btn{
     width:100%; text-align:center; padding:14px 12px; border-radius:14px;
@@ -363,14 +362,25 @@
           <div class="muted">Last Roll Total</div>
           <div class="sum" id="sum">—</div>
         </div>
+
+        <!-- NEW: Extra dice controls -->
         <div class="controls">
+          <div class="tiny muted" style="margin-right:4px;">Extra Dice:</div>
+          <button type="button" class="btn small ghost" data-extra-sides="4">+d4</button>
+          <button type="button" class="btn small ghost" data-extra-sides="6">+d6</button>
+          <button type="button" class="btn small ghost" data-extra-sides="8">+d8</button>
+          <button type="button" class="btn small ghost" data-extra-sides="12">+d12</button>
+          <button type="button" id="clearExtras" class="btn small ghost">Reset Extra</button>
           <button id="clearView" class="btn small ghost" title="Clear results view">Clear View</button>
         </div>
       </div>
+
       <div class="row" style="margin-top:8px">
         <div class="pill">Crit Roll: <span id="critVal">—</span></div>
         <div class="pill" id="poolMeta">—</div>
         <div class="pill" id="timeMeta">—</div>
+        <!-- NEW: shows extra dice summary -->
+        <div class="pill" id="extraMeta">Extra: —</div>
       </div>
 
       <!-- dice animation + dropdown -->
@@ -627,6 +637,15 @@ const POOLS = [
 
   const DEFAULT_VISIBLE = new Set([1,2,3,4,5,6,7,8]);
 
+  // NEW: extra dice config (d4, d6, d8, d12)
+  const EXTRA_SIDES = [4, 6, 8, 12];
+  let extraDiceCounts = {
+    4: 0,
+    6: 0,
+    8: 0,
+    12: 0
+  };
+
   // ---------- DOM ----------
   const byId = id => document.getElementById(id);
 
@@ -638,9 +657,12 @@ const POOLS = [
   const poolMetaEl   = byId('poolMeta');
   const timeMetaEl   = byId('timeMeta');
   const breakdownSummaryEl = byId('breakdownSummary');
+  const extraMetaEl  = byId('extraMeta');  // NEW
 
   const clearViewBtn    = byId('clearView');
   const clearHistoryBtn = byId('clearHistory');
+  const clearExtrasBtn  = byId('clearExtras'); // NEW
+  const extraButtons    = document.querySelectorAll('[data-extra-sides]'); // NEW
 
   const drawer           = byId('drawer');
   const openDrawerBtn    = byId('openDrawer');
@@ -767,8 +789,40 @@ const POOLS = [
     return {chain, sum};
   }
 
-  function rollPool(formula){
+  // NEW: build a human-readable "extra" string for UI/history
+  function formatExtraFormula(){
+    const parts = [];
+    for (const sides of EXTRA_SIDES){
+      const count = extraDiceCounts[sides] || 0;
+      if (count > 0){
+        parts.push(`${count}d${sides}`);
+      }
+    }
+    return parts;
+  }
+
+  // NEW: update the "Extra: ..." pill
+  function updateExtraMeta(){
+    if (!extraMetaEl) return;
+    const parts = formatExtraFormula();
+    extraMetaEl.textContent = parts.length ? `Extra: ${parts.join(' + ')}` : 'Extra: —';
+  }
+
+  // UPDATED: rollPool now accepts optional extra dice spec
+  function rollPool(formula, extraSpec){
     const parts = parseFormula(formula);
+
+    // If extraSpec is provided, append those dice to the parts
+    if (extraSpec){
+      Object.keys(extraSpec).forEach(key=>{
+        const sides = parseInt(key,10);
+        const count = extraSpec[key];
+        if (count && count > 0){
+          parts.push({ count, sides });
+        }
+      });
+    }
+
     const perDieLines = [];
     const diceStates  = [];
     let total = 0;
@@ -1179,12 +1233,19 @@ const POOLS = [
   // ---------- Actions ----------
   function handleRoll(poolNumber){
     const idx     = clamp(poolNumber,1,POOLS.length)-1;
-    const formula = POOLS[idx];
+    const baseFormula = POOLS[idx];
     const name    = `Pool ${poolNumber}`;
-    const { total, lines, crit, dice } = rollPool(formula);
+
+    // Build the extra part for display (but rollPool gets base + extras via extraDiceCounts)
+    const extraParts = formatExtraFormula();
+    const fullFormula = extraParts.length
+      ? `${baseFormula} + ${extraParts.join(' + ')}`
+      : baseFormula;
+
+    const { total, lines, crit, dice } = rollPool(baseFormula, extraDiceCounts);
     const time    = new Date().toLocaleTimeString();
 
-    const entry = { poolName: name, formula, total, lines, crit, time, dice };
+    const entry = { poolName: name, formula: fullFormula, total, lines, crit, time, dice };
     lastRoll = entry;
 
     HISTORY.unshift(entry);
@@ -1215,6 +1276,25 @@ const POOLS = [
     renderHistory();
     if (navigator.vibrate) navigator.vibrate(8);
   });
+
+  // NEW: hook up extra dice buttons
+  extraButtons.forEach(btn=>{
+    const sides = parseInt(btn.getAttribute('data-extra-sides'), 10);
+    if (!sides) return;
+    btn.addEventListener('click', ()=>{
+      extraDiceCounts[sides] = (extraDiceCounts[sides] || 0) + 1;
+      updateExtraMeta();
+      if (navigator.vibrate) navigator.vibrate(5);
+    });
+  });
+
+  if (clearExtrasBtn){
+    clearExtrasBtn.addEventListener('click', ()=>{
+      EXTRA_SIDES.forEach(s => extraDiceCounts[s] = 0);
+      updateExtraMeta();
+      if (navigator.vibrate) navigator.vibrate(8);
+    });
+  }
 
   function openDrawerPanel(){
     drawer.classList.add('open');
@@ -1543,6 +1623,7 @@ const POOLS = [
   renderDrawer();
   renderHistory();
   syncColorsFromSliders(); // ensure dice + UI colors match sliders on load
+  updateExtraMeta();       // ensure Extra: pill starts in sync
 })();
 </script>
 </body>
